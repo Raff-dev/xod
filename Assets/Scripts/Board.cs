@@ -68,20 +68,24 @@ public class Board : MonoBehaviour
         {
             if (hit.collider != null)
             {
-                hit.collider.GetComponent<ActionEntity>().onClick();
+                Clickable clickable = hit.collider.transform.parent.GetComponent<Clickable>();
+                Tile tile = hit.collider.transform.parent.GetComponent<Tile>();
+                if (clickable != null)
+                {
+                    clickable.onClick();
+                }
             }
         }
     }
 
+    public Player getCurrentPlayer()
+    {
+        return turn % 2 == 0 ? Player.X : Player.O;
+    }
+
     public void processDecision(Tile tile)
     {
-        Player currentPlayer = turn % 2 == 0 ? Player.X : Player.O;
-        if (tile.player != Player.NONE)
-        {
-            return;
-        }
         turn++;
-        tile.onClick(currentPlayer);
         bool isOver = isGameOver(tile.x, tile.y, tile.player);
         bool isDraw = !isOver && turn == BOARD_SIZE * BOARD_SIZE;
 
@@ -101,12 +105,14 @@ public class Board : MonoBehaviour
             // if menu -> hide current menu, open menu
             // if reset -> for tile in tile: tile.setactive
         }
-        else if (isAI)
-        {
-            //sleep(0.5)
-            Tile tile = this.ai.takeTurn();
-            this.processDecision(tile);
-        }
+
+        // TODO
+        // else if (isAI)
+        // {
+        //     //sleep(0.5)
+        //     Tile tile = this.ai.takeTurn();
+        //     tile.onClick();
+        // }
     }
 
     private bool isGameOver(int x, int y, Player player)
@@ -136,7 +142,7 @@ public class Board : MonoBehaviour
         this.ai.gameLevel = AI.GameLevel.hard;
     }
 
-    void easyButtonOnClick()
+    void pvpButtonOnClick()
     {
         this.ai = null; ;
     }

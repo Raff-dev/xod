@@ -1,7 +1,6 @@
 using UnityEngine;
 
-public class Tile : MonoBehaviour, ActionEntity
-
+public class Tile : Clickable
 {
     public int x { get; protected set; }
     public int y { get; protected set; }
@@ -21,6 +20,7 @@ public class Tile : MonoBehaviour, ActionEntity
     private void Start()
     {
         this.player = Board.Player.NONE;
+        this.isActive = true;
 
         pivot = transform.position;
         height /= 2;
@@ -35,8 +35,9 @@ public class Tile : MonoBehaviour, ActionEntity
         transform.position = nextPos;
     }
 
-    internal void onClick(Board.Player player)
+    public override void onClick()
     {
+        Board.Player player = this.board.getCurrentPlayer();
         if (!this.isActive || this.player != Board.Player.NONE || player == Board.Player.NONE)
         {
             return;
@@ -66,36 +67,5 @@ public class Tile : MonoBehaviour, ActionEntity
             }
         }
         return null;
-    }
-
-    public void onClick()
-    {
-        Player currentPlayer = turn % 2 == 0 ? Player.X : Player.O;
-        Tile tile = hit.collider.transform.parent.GetComponent<Tile>();
-        if (tile.player != Player.NONE)
-        {
-            return;
-        }
-        turn++;
-        tile.onClick(currentPlayer);
-        bool isOver = isGameOver(tile.x, tile.y, tile.player);
-        bool isDraw = !isOver && turn == Board.BOARD_SIZE * BOARD_SIZE;
-
-        if (isOver || isDraw)
-        {
-            for (int y = 0; y < BOARD_SIZE; y++)
-                for (int x = 0; x < BOARD_SIZE; x++)
-                {
-                    Destroy(tiles[y, x].mark);
-                    tiles[y, x].isActive = false;
-                }
-
-            // open reset menu
-            // if reset for tile in tiles: tile.setactive
-            // TODO change initialize to hide 
-            // if menu 
-            // initialize();
-
-        }
     }
 }
