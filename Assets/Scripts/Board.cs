@@ -13,9 +13,9 @@ public class Board : MonoBehaviour
     [SerializeField] private GameObject resetButton;
 
 
-    public AI ai; // make sure 
+    //public AI ai; // make sure 
     public int turn;
-    private Tile[,] tiles;
+    public Tile[,] tiles;
 
     void initialize()
     {
@@ -101,15 +101,15 @@ public class Board : MonoBehaviour
             // if menu -> hide current menu, open menu
             // if reset -> for tile in tile: tile.setactive
         }
-        else if (isAI)
-        {
-            //sleep(0.5)
-            Tile tile = this.ai.takeTurn();
-            this.processDecision(tile);
-        }
+        //else if (isAI)
+        //{
+        //    //sleep(0.5)
+        //    Tile tile = this.ai.takeTurn();
+        //    this.processDecision(tile);
+        //}
     }
 
-    private bool isGameOver(int x, int y, Player player)
+    public bool isGameOver(int x, int y, Player player)
     {
         int col, row, diag, rdiag;
         col = row = diag = rdiag = 0;
@@ -128,16 +128,16 @@ public class Board : MonoBehaviour
     // board może zostać wsm główną klasą, która będzie handlowała te guziki itp
     void easyButtonOnClick()
     {
-        this.ai.gameLevel = AI.GameLevel.easy;
+        // this.ai.gameLevel = AI.GameLevel.easy;
     }
 
     void hardButtonOnClick()
     {
-        this.ai.gameLevel = AI.GameLevel.hard;
+        //this.ai.gameLevel = AI.GameLevel.hard;
     }
 
-    void easyButtonOnClick()
+    void randomButtonOnClick()
     {
-        this.ai = null; ;
+        //this.ai = null;
     }
 }
