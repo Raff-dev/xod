@@ -1,8 +1,11 @@
+using System;
+using System.Collections;
 using UnityEngine;
 
 public class Board : MonoBehaviour
 {
     public enum Player { X, O, NONE }
+
     public const string TILEBLOCK_TAG = "TileBlock";
     public const int BOARD_SIZE = 3;
 
@@ -19,6 +22,7 @@ public class Board : MonoBehaviour
 
     void initialize()
     {
+        this.ai = new AI(AI.GameLevel.easy);
         this.turn = 0;
         this.tiles = new Tile[BOARD_SIZE, BOARD_SIZE];
         for (int y = 0; y < BOARD_SIZE; y++)
@@ -27,7 +31,8 @@ public class Board : MonoBehaviour
             {
                 Vector3 tilePosition = getTilePosition(x, y);
                 Tile tile = Instantiate(this.tilePrefab, tilePosition, Quaternion.identity, this.tileContainer).GetComponent<Tile>();
-
+                tile.isActive = true;
+                tile.player = Board.Player.NONE;
                 tile.setArrangement(this, x, y);
                 tiles[y, x] = tile;
             }
@@ -95,8 +100,10 @@ public class Board : MonoBehaviour
                 for (int x = 0; x < BOARD_SIZE; x++)
                 {
                     Destroy(tiles[y, x].mark);
-                    tiles[y, x].isActive = false;
+                    //tiles[y, x].isActive = false;
+                    tiles[y, x].player = Board.Player.NONE;
                     this.turn = 0;
+                    //this.ai = null;
                 }
 
             // open reset menu
@@ -105,14 +112,24 @@ public class Board : MonoBehaviour
             // if menu -> hide current menu, open menu
             // if reset -> for tile in tile: tile.setactive
         }
+        else if(this.ai.gameLevel == AI.GameLevel.easy) 
+        {
+            if (turn % 2 == 1)
+            {
+                Wait(.3f, () => {
+                    ai.takeTurnEasy(tiles);
+                });
+            }
+        }else if(this.ai.gameLevel == AI.GameLevel.hard)
+        {
+            if (turn % 2 == 1)
+            {
+                Wait(.3f, () => {
+                    ai.takeTurnHard(tiles);
+                });
+            }
+        }
 
-        // TODO
-        // else if (isAI)
-        // {
-        //     //sleep(0.5)
-        //     Tile tile = this.ai.takeTurn();
-        //     tile.onClick();
-        // }
     }
 
     private bool isGameOver(int x, int y, Player player)
@@ -131,7 +148,6 @@ public class Board : MonoBehaviour
     }
 
 
-    // board może zostać wsm główną klasą, która będzie handlowała te guziki itp
     void easyButtonOnClick()
     {
         this.ai.gameLevel = AI.GameLevel.easy;
@@ -144,6 +160,16 @@ public class Board : MonoBehaviour
 
     void pvpButtonOnClick()
     {
-        this.ai = null; ;
+        this.ai = null;
+    }
+
+    public void Wait(float seconds, Action action)
+    {
+        StartCoroutine(_wait(seconds, action));
+    }
+    IEnumerator _wait(float time, Action callback)
+    {
+        yield return new WaitForSeconds(time);
+        callback();
     }
 }

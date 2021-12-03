@@ -4,12 +4,12 @@ public class Tile : Clickable
 {
     public int x { get; protected set; }
     public int y { get; protected set; }
-    public Board.Player player { get; protected set; }
+    public Board.Player player { get; set; }
     [SerializeField] private GameObject markX;
     [SerializeField] private GameObject markO;
     public GameObject mark;
     public bool isActive;
-    private Board board;
+    public Board board;
 
     // variables for floaty movement of the board
     public float timePeriod = 2;
@@ -37,9 +37,12 @@ public class Tile : Clickable
 
     public override void onClick()
     {
+
         Board.Player player = this.board.getCurrentPlayer();
+        Debug.Log("player=" + player + ", this.player=" + this.player + ", this.isActive=" + this.isActive);
         if (!this.isActive || this.player != Board.Player.NONE || player == Board.Player.NONE)
         {
+            Debug.Log("not executing tile.onClick()");
             return;
         }
 
