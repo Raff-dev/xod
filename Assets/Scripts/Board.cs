@@ -1,8 +1,12 @@
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class Board : MonoBehaviour
 {
+    public enum GameMode { pvp, easy, hard }
     public enum Player { X, O, NONE }
+
     public const string TILEBLOCK_TAG = "TileBlock";
     public const int BOARD_SIZE = 3;
 
@@ -12,12 +16,16 @@ public class Board : MonoBehaviour
     [SerializeField] private GameObject tilePrefab;
     [SerializeField] private GameObject resetButton;
 
-
-    public AI ai; // make sure 
     public int turn;
     private Tile[,] tiles;
+    internal GameMode gameMode;
 
-    void initialize()
+    private static readonly System.Random random = new System.Random();
+    [SerializeField] private GameObject resultDraw;
+    [SerializeField] private GameObject resultWinnerX;
+    [SerializeField] private GameObject resultWinnerO;
+
+    void generateTiles()
     {
         this.turn = 0;
         this.tiles = new Tile[BOARD_SIZE, BOARD_SIZE];
@@ -41,7 +49,7 @@ public class Board : MonoBehaviour
 
     private void Start()
     {
-        initialize();
+        generateTiles();
     }
 
     void Update()
@@ -68,8 +76,11 @@ public class Board : MonoBehaviour
         {
             if (hit.collider != null)
             {
-                Clickable clickable = hit.collider.transform.parent.GetComponent<Clickable>();
-                Tile tile = hit.collider.transform.parent.GetComponent<Tile>();
+                Clickable clickable = hit.collider.GetComponent<Clickable>();
+                if (clickable == null)
+                {
+                    clickable = hit.collider.transform.parent.GetComponent<Clickable>();
+                }
                 if (clickable != null)
                 {
                     clickable.onClick();
@@ -78,11 +89,38 @@ public class Board : MonoBehaviour
         }
     }
 
+    internal void startGame()
+    {
+        this.resultDraw.SetActive(false);
+        this.resultWinnerO.SetActive(false);
+        this.resultWinnerX.SetActive(false);
+
+        this.turn = 0;
+        for (int y = 0; y < BOARD_SIZE; y++)
+            for (int x = 0; x < BOARD_SIZE; x++)
+            {
+                tiles[y, x].reset();
+            }
+    }
+
+    internal void freezeGame()
+    {
+        for (int y = 0; y < BOARD_SIZE; y++)
+            for (int x = 0; x < BOARD_SIZE; x++)
+            {
+                tiles[y, x].disable();
+            }
+    }
+
     public Player getCurrentPlayer()
     {
         return turn % 2 == 0 ? Player.X : Player.O;
     }
-
+    internal bool isPlayerTurn()
+    {
+        Player player = this.getCurrentPlayer();
+        return this.gameMode == GameMode.pvp || player == Player.X;
+    }
     public void processDecision(Tile tile)
     {
         turn++;
@@ -94,25 +132,94 @@ public class Board : MonoBehaviour
             for (int y = 0; y < BOARD_SIZE; y++)
                 for (int x = 0; x < BOARD_SIZE; x++)
                 {
-                    Destroy(tiles[y, x].mark);
-                    tiles[y, x].isActive = false;
-                    this.turn = 0;
+                    tiles[y, x].disable();
                 }
 
-            // open reset menu
-            // tile in tiles: tile.setactive
-            // options : reset, menu
-            // if menu -> hide current menu, open menu
-            // if reset -> for tile in tile: tile.setactive
+            if (isDraw)
+            {
+                this.resultDraw.SetActive(true);
+            }
+            else
+            {
+                GameObject result = tile.player == Player.X ? resultWinnerX : resultWinnerO;
+                result.SetActive(true);
+            }
+            return;
+        }
+        if (this.gameMode == GameMode.pvp || this.isPlayerTurn())
+        {
+            return;
         }
 
-        // TODO
-        // else if (isAI)
+        if (this.gameMode == GameMode.easy)
+        {
+            this.takeTurnEasy().onClick();
+        }
+        else if (this.gameMode == GameMode.hard)
+        {
+            this.takeTurnHard().onClick();
+        }
+    }
+
+    private Tile takeTurnHard()
+    {
+        return this.takeTurnEasy();
+        //TODO make this minimax work (or some other one)
+        // Player aiPlayer = Player.O;
+        // Player playerPlayer = Player.X;
+
+        // float minimax(int[,] board, bool isMinimizing)
         // {
-        //     //sleep(0.5)
-        //     Tile tile = this.ai.takeTurn();
-        //     tile.onClick();
+
+        //     int[,] copy = board.Clone() as int[,];
+
+        //     //if I won - > return 10
+        //     if (isWinner(aiPlayer, copy))
+        //         return 10f;
+        //     // if opponent won - > return -10
+        //     if (isWinner(playerPlayer, copy))
+        //         return -10f;
+        //     // if no moves left - > return 0
+        //     if (isFull(copy))
+        //         return 0;
+
+        //     List<float> scores = new List<float>();
+        //     for (int i = 0; i < BOARD_SIZE; i++)
+        //     {
+        //         for (int j = 0; j < BOARD_SIZE; j++)
+        //         {
+        //             if (copy[i, j] == -1)
+        //             {
+        //                 copy[i, j] = isMinimizing ? aiPlayer : playerPlayer;
+        //                 float score = minimax(copy, !isMinimizing);
+        //                 copy[i, j] = -1;
+        //                 scores.Add(score);
+        //             }
+        //         }
+        //     }
+        //     if (isMinimizing)
+        //         return scores.Max();
+
+        //     return scores.Min();
+
         // }
+    }
+
+    private Tile takeTurnEasy()
+    {
+        HashSet<Tile> available = new HashSet<Tile>();
+        for (int y = 0; y < BOARD_SIZE; y++)
+            for (int x = 0; x < BOARD_SIZE; x++)
+                if (tiles[y, x].player == Player.NONE)
+                {
+                    available.Add(tiles[y, x]);
+                }
+
+        if (available.Count < 1)
+        {
+            return null;
+        }
+        return available.ElementAt(random.Next(available.Count));
     }
 
     private bool isGameOver(int x, int y, Player player)
@@ -128,22 +235,5 @@ public class Board : MonoBehaviour
             if (tiles[i, BOARD_SIZE - i - 1].player == player) rdiag++;
         }
         return col == BOARD_SIZE || row == BOARD_SIZE || diag == BOARD_SIZE || rdiag == BOARD_SIZE;
-    }
-
-
-    // board może zostać wsm główną klasą, która będzie handlowała te guziki itp
-    void easyButtonOnClick()
-    {
-        this.ai.gameLevel = AI.GameLevel.easy;
-    }
-
-    void hardButtonOnClick()
-    {
-        this.ai.gameLevel = AI.GameLevel.hard;
-    }
-
-    void pvpButtonOnClick()
-    {
-        this.ai = null; ;
     }
 }

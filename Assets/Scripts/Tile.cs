@@ -4,7 +4,7 @@ public class Tile : Clickable
 {
     public int x { get; protected set; }
     public int y { get; protected set; }
-    public Board.Player player { get; protected set; }
+    public Board.Player player { get; set; }
     [SerializeField] private GameObject markX;
     [SerializeField] private GameObject markO;
     public GameObject mark;
@@ -20,7 +20,7 @@ public class Tile : Clickable
     private void Start()
     {
         this.player = Board.Player.NONE;
-        this.isActive = true;
+        this.isActive = false;
 
         pivot = transform.position;
         height /= 2;
@@ -56,16 +56,16 @@ public class Tile : Clickable
         this.y = y;
     }
 
-    private GameObject getChildByName(Transform parent, string tag)
+    internal void reset()
     {
-        for (int i = 0; i < parent.childCount; i++)
-        {
-            GameObject obj = parent.GetChild(i).gameObject;
-            if (obj.CompareTag(tag))
-            {
-                return obj;
-            }
-        }
-        return null;
+        Destroy(this.mark);
+        this.mark = null;
+        this.player = Board.Player.NONE;
+        this.isActive = true;
+    }
+
+    internal void disable()
+    {
+        this.isActive = false;
     }
 }

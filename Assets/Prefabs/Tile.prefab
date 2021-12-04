@@ -61,7 +61,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 3da9f46cf360d244ca8e32c96d149ead, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -140,7 +140,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 18220e087135fc04b9d9371a1d1f3402, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  markX: {fileID: 8367487562059904273, guid: 7cd04ebff233d9845a65e35b8f6d0a17, type: 3}
-  markO: {fileID: 4433855287811614390, guid: 661cdcf740b106a4690a2995bfd2db6d, type: 3}
+  markX: {fileID: 8612015981398890222, guid: 7cd04ebff233d9845a65e35b8f6d0a17, type: 3}
+  markO: {fileID: 1752006715004914531, guid: 7c996e566dc61e240bad0d5185ffe93a, type: 3}
+  mark: {fileID: 0}
+  isActive: 0
   timePeriod: 3
   height: 0.02
