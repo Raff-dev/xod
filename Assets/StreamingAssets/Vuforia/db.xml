@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<QCARConfig xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="qcar_config.xsd">
+  <Tracking>
+    <ImageTarget name="zesz" size="0.215000 0.293023" />
+    <ImageTarget name="zesz_flash" size="0.215000 0.301065" />
+    <ImageTarget name="zeszyt" size="0.210000 0.295776" />
+  </Tracking>
+</QCARConfig>
