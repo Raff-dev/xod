@@ -10,8 +10,8 @@ public class Board : MonoBehaviour
     public const string TILEBLOCK_TAG = "TileBlock";
     public const int BOARD_SIZE = 3;
 
-    [SerializeField] private float tileSpacing = 0.7f;
-    [SerializeField] private float tileOffsetY = 0.3f;
+    [SerializeField] private float tileSpacing;
+    [SerializeField] private float tileOffsetY;
     [SerializeField] private Transform tileContainer;
     [SerializeField] private GameObject tilePrefab;
     [SerializeField] private GameObject resetButton;

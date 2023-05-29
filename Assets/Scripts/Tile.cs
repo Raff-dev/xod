@@ -29,10 +29,10 @@ public class Tile : Clickable
 
     void Update()
     {
-        Vector3 nextPos = transform.position;
-        nextPos.y = pivot.y + height + height * Mathf.Sin(((Mathf.PI * 2) / timePeriod) * timeSinceStart);
-        timeSinceStart += Time.deltaTime;
-        transform.position = nextPos;
+        //Vector3 nextPos = transform.position;
+        //nextPos.y = pivot.y + height + height * Mathf.Sin(((Mathf.PI * 2) / timePeriod) * timeSinceStart);
+        //timeSinceStart += Time.deltaTime;
+        //transform.position = nextPos;
     }
 
     public override void onClick()
@@ -45,7 +45,8 @@ public class Tile : Clickable
 
         this.player = player;
         GameObject mark = player == Board.Player.X ? this.markX : this.markO;
-        this.mark = Instantiate(mark, transform.position + mark.transform.position, mark.transform.rotation, transform);
+        // AR mode adjustments
+        this.mark = Instantiate(mark, transform.position + new Vector3(0, .01f, 0), mark.transform.rotation, transform);
         this.board.processDecision(this);
     }
 
